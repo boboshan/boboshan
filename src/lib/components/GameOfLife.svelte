@@ -19,8 +19,6 @@
 	const GRID_COLOR = colors.grid;
 	const FROZEN_COLOR = colors.light; // Same as normal cells (no blue distinction)
 	const PADDING_CELL_COLOR = 'rgba(232, 232, 232, 0.15)'; // Subtle version of normal color
-	const TITLE_BG_COLOR = 'rgba(20, 20, 20, 0.3)';
-	const TITLE_BORDER_COLOR = 'rgba(40, 40, 40, 0.3)';
 
 	// Responsive cell size - smaller on mobile (but not too small)
 	let cellSize = $state(8);
@@ -422,21 +420,6 @@
 			ctx.moveTo(0, j * cellSize);
 			ctx.lineTo(width, j * cellSize);
 			ctx.stroke();
-		}
-
-		// Draw title padding area background (only if there are frozen cells)
-		if (frozenCells.size > 0) {
-			const padX = titleBounds.startX * cellSize;
-			const padY = titleBounds.startY * cellSize;
-			const padW = (titleBounds.endX - titleBounds.startX) * cellSize;
-			const padH = (titleBounds.endY - titleBounds.startY) * cellSize;
-
-			ctx.fillStyle = TITLE_BG_COLOR;
-			ctx.fillRect(padX, padY, padW, padH);
-
-			ctx.strokeStyle = TITLE_BORDER_COLOR;
-			ctx.lineWidth = 1;
-			ctx.strokeRect(padX, padY, padW, padH);
 		}
 
 		// Draw cells

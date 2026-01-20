@@ -27,7 +27,7 @@
 
 		<!-- Desktop Navigation -->
 		<div class="gap-6 hidden md:flex">
-			{#each navItems as item (item.href)}
+			{#each navItems.filter((item) => item.href !== '/') as item (item.href)}
 				<a
 					href={item.href}
 					class="text-xs font-pixel transition-colors"
