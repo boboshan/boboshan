@@ -179,15 +179,19 @@
 		const patternWidth = chosen.width;
 		const patternHeight = chosen.height;
 
+		// P70 and P72 are wide orthogonal patterns that need special handling
+		const isWideOrthogonal = !chosen.diagonal && patternWidth > 15;
+
 		// Calculate spacing based on pattern size - ensure multiple patterns visible
 		// Minimum 3-4 patterns on each axis for a lively look
-		const minPatternsX = 4;
+		const minPatternsX = isWideOrthogonal ? 2 : 4;
 		const minPatternsY = 3;
-		const baseSpacing = Math.max(patternWidth, patternHeight) + 10;
+		const baseSpacingX = patternWidth + (isWideOrthogonal ? 20 : 10);
+		const baseSpacingY = patternHeight + (isWideOrthogonal ? 15 : 10);
 		const maxSpacingX = Math.floor(c / minPatternsX);
 		const maxSpacingY = Math.floor(r / minPatternsY);
-		const spacingX = Math.min(baseSpacing, maxSpacingX);
-		const spacingY = Math.min(baseSpacing, maxSpacingY);
+		const spacingX = Math.min(baseSpacingX, maxSpacingX);
+		const spacingY = Math.min(baseSpacingY, maxSpacingY);
 
 		const lanesY = Math.floor(r / spacingY);
 		const lanesX = Math.floor(c / spacingX);
@@ -196,8 +200,9 @@
 		for (let ly = 0; ly < lanesY; ly++) {
 			for (let lx = 0; lx < lanesX; lx++) {
 				// Stagger pattern positions to avoid straight lines
+				// Wide orthogonal patterns need clean horizontal lanes - no vertical offset
 				const offsetX = (ly % 3) * Math.floor(spacingX / 4);
-				const offsetY = (lx % 2) * Math.floor(spacingY / 3);
+				const offsetY = isWideOrthogonal ? 0 : (lx % 2) * Math.floor(spacingY / 3);
 				const x = lx * spacingX + offsetX + 5;
 				const y = ly * spacingY + offsetY + 5;
 

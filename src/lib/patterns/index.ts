@@ -272,7 +272,7 @@ function makePatternInfo(
 export const SMALL_PATTERNS: PatternInfo[] = [
 	makePatternInfo(GLIDER, 'Glider', 'c/4', true),
 	makePatternInfo(LWSS, 'LWSS', 'c/2', false),
-	makePatternInfo(MWSS, 'MWSS', 'c/2', false),
+	// makePatternInfo(MWSS, 'MWSS', 'c/2', false),
 	makePatternInfo(B29, 'B29', 'c/4', true)
 ];
 
