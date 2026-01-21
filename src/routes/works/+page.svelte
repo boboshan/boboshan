@@ -50,9 +50,14 @@
 
 {#snippet workContent(work: Work)}
 	<div class="flex items-start justify-between">
-		<h2 class="text-sm text-light font-pixel transition-colors group-hover:text-accent">
-			{work.title}{#if work.url}
-				↗{/if}
+		<h2
+			class="text-sm text-light font-pixel inline-flex gap-1 transition-colors items-center group-hover:text-accent"
+		>
+			{work.title}{#if work.url}<svg
+					class="h-3 w-3 inline-block"
+					viewBox="0 0 8 8"
+					fill="currentColor"><path d="M2 0h6v6h-2v-2h-2v-2h-2zM0 4h2v2h2v2h-4z" /></svg
+				>{/if}
 		</h2>
 		<span class="text-xs text-light/50 font-mono">{work.year}</span>
 	</div>

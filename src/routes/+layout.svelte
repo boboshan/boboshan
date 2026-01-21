@@ -30,7 +30,7 @@
 	<GameOfLife bind:this={gameOfLifeRef} />
 	<Navigation />
 	<main
-		class="px-4 pb-8 pt-20 max-w-full pointer-events-none relative z-10 [&_a]:pointer-events-auto [&_button]:pointer-events-auto [&_input]:pointer-events-auto"
+		class="px-4 pb-8 pt-20 max-w-full pointer-events-none relative z-10 [&_.pixel-container]:pointer-events-auto [&_.prose]:pointer-events-auto [&_a]:pointer-events-auto [&_button]:pointer-events-auto [&_input]:pointer-events-auto"
 	>
 		{@render children()}
 	</main>
