@@ -39,6 +39,11 @@
 <style>
 	:global(html) {
 		background-color: #0a0a0a;
+		overscroll-behavior: none;
+	}
+
+	:global(body) {
+		overscroll-behavior: none;
 	}
 
 	:global(a) {

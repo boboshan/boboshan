@@ -33,10 +33,6 @@
 			<div class="prose text-sm text-light/80 leading-relaxed font-mono space-y-4">
 				<postData.content />
 			</div>
-
-			<div class="mt-8 pt-4 border-t border-light/20">
-				<p class="text-xs text-light/40">// {postData.meta.date}</p>
-			</div>
 		</article>
 	{:else}
 		<div class="mt-6 pixel-container text-center">

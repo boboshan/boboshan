@@ -41,6 +41,7 @@
 	let animationId: number;
 	let lastUpdate = 0;
 	let lastInteraction = 0;
+	let lastWidth = 0; // Track last width to avoid unnecessary resize on mobile scroll
 	const UPDATE_INTERVAL = 120; // ms between updates
 	const INTERACTION_THROTTLE = 200; // ms between mouse interactions
 
@@ -525,8 +526,16 @@
 	}
 
 	function handleResize(): void {
-		width = window.innerWidth;
-		height = window.innerHeight;
+		const newWidth = window.innerWidth;
+		const newHeight = window.innerHeight;
+
+		// On mobile, scrolling can trigger resize events when browser chrome shows/hides
+		// Only reinitialize the grid if the width actually changed
+		const widthChanged = newWidth !== lastWidth;
+		lastWidth = newWidth;
+
+		width = newWidth;
+		height = newHeight;
 
 		// Smaller cells on mobile (but not too small)
 		cellSize = width < 480 ? 6 : width < 768 ? 7 : 8;
@@ -535,11 +544,15 @@
 			canvas.width = width;
 			canvas.height = height;
 		}
-		const newCols = Math.floor(width / cellSize);
-		const newRows = Math.floor(height / cellSize);
-		const newGrid = createGrid(newCols, newRows);
-		initializeTitleCells(newCols, newRows, newGrid);
-		grid = newGrid;
+
+		// Only recreate grid if width changed (actual resize, not mobile scroll)
+		if (widthChanged || grid.length === 0) {
+			const newCols = Math.floor(width / cellSize);
+			const newRows = Math.floor(height / cellSize);
+			const newGrid = createGrid(newCols, newRows);
+			initializeTitleCells(newCols, newRows, newGrid);
+			grid = newGrid;
+		}
 	}
 
 	export function resetGrid(): void {
@@ -567,10 +580,16 @@
 		window.addEventListener('resize', handleResize);
 		window.addEventListener('mouseup', handleMouseUp);
 
+		// Add touch listeners with passive: false to allow preventDefault
+		canvas.addEventListener('touchstart', handleTouchStart, { passive: true });
+		canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+
 		return () => {
 			cancelAnimationFrame(animationId);
 			window.removeEventListener('resize', handleResize);
 			window.removeEventListener('mouseup', handleMouseUp);
+			canvas.removeEventListener('touchstart', handleTouchStart);
+			canvas.removeEventListener('touchmove', handleTouchMove);
 		};
 	});
 </script>
@@ -582,6 +601,4 @@
 	ondblclick={handleDoubleClick}
 	onmousedown={handleMouseDown}
 	onmousemove={handleMouseMove}
-	ontouchstart={handleTouchStart}
-	ontouchmove={handleTouchMove}
 ></canvas>
