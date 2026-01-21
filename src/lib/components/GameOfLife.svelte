@@ -9,6 +9,7 @@
 		LETTER_GAP,
 		TITLE_TEXT
 	} from '$lib/constants';
+	import { GLIDER, getRandomPattern } from '$lib/patterns';
 
 	let canvas: HTMLCanvasElement;
 	let ctx: CanvasRenderingContext2D | null = null;
@@ -121,30 +122,7 @@
 		}
 	}
 
-	// Spaceship patterns (all moving RIGHT)
-	// Glider moving down-right
-	const GLIDER = [
-		[0, 1, 0],
-		[0, 0, 1],
-		[1, 1, 1]
-	];
-
-	// LWSS moving right (flipped horizontally)
-	const LWSS = [
-		[1, 0, 0, 1, 0],
-		[0, 0, 0, 0, 1],
-		[1, 0, 0, 0, 1],
-		[0, 1, 1, 1, 1]
-	];
-
-	// MWSS moving right (flipped horizontally)
-	const MWSS = [
-		[0, 0, 0, 1, 0, 0],
-		[1, 0, 0, 0, 1, 0],
-		[0, 0, 0, 0, 0, 1],
-		[1, 0, 0, 0, 0, 1],
-		[0, 1, 1, 1, 1, 1]
-	];
+	// Spaceship patterns are now imported from $lib/patterns
 
 	function placePattern(
 		g: boolean[][],
@@ -196,101 +174,40 @@
 			);
 		}
 
-		// Dense pattern placement for a lively simulation
-		// Scale with screen size - all moving RIGHT
-		// Key: use separate horizontal "lanes" to avoid collisions
-		// Use higher base density on mobile (smaller screens)
-		const isMobile = c < 60;
-		const baseDensity = isMobile ? 1.5 : 1;
-		const density = (Math.max(c, r) / 100) * baseDensity;
+		// Pick one random pattern appropriate for screen size
+		const chosen = getRandomPattern(c, r);
+		const patternWidth = chosen.width;
+		const patternHeight = chosen.height;
 
-		// Glider streams on dedicated lanes (gliders move diagonally down-right)
-		// Stagger starting X positions so they don't catch up
-		const gliderSpacing = isMobile ? 12 : 18;
-		const gliderLanes = Math.floor(r / gliderSpacing);
-		for (let lane = 0; lane < gliderLanes; lane++) {
-			const y = lane * gliderSpacing + 8;
-			// Multiple gliders per lane across full width
-			const glidersInLane = Math.floor((isMobile ? 8 : 5) * density);
-			for (let i = 0; i < glidersInLane; i++) {
-				// Spread across entire width
-				const xSpacing = isMobile ? 20 : 30;
-				const x = i * xSpacing + (lane % 5) * 6 + 5;
-				if (x < c - 10 && y < r - 10 && !isInTitleZone(x, y, 3, 3)) {
-					placePattern(newGrid, GLIDER, x, y, c, r);
+		// Calculate spacing based on pattern size - ensure multiple patterns visible
+		// Minimum 3-4 patterns on each axis for a lively look
+		const minPatternsX = 4;
+		const minPatternsY = 3;
+		const baseSpacing = Math.max(patternWidth, patternHeight) + 10;
+		const maxSpacingX = Math.floor(c / minPatternsX);
+		const maxSpacingY = Math.floor(r / minPatternsY);
+		const spacingX = Math.min(baseSpacing, maxSpacingX);
+		const spacingY = Math.min(baseSpacing, maxSpacingY);
+
+		const lanesY = Math.floor(r / spacingY);
+		const lanesX = Math.floor(c / spacingX);
+
+		// Place patterns in a grid with some offset variation for visual interest
+		for (let ly = 0; ly < lanesY; ly++) {
+			for (let lx = 0; lx < lanesX; lx++) {
+				// Stagger pattern positions to avoid straight lines
+				const offsetX = (ly % 3) * Math.floor(spacingX / 4);
+				const offsetY = (lx % 2) * Math.floor(spacingY / 3);
+				const x = lx * spacingX + offsetX + 5;
+				const y = ly * spacingY + offsetY + 5;
+
+				if (
+					x < c - patternWidth - 5 &&
+					y < r - patternHeight - 5 &&
+					!isInTitleZone(x, y, patternWidth, patternHeight)
+				) {
+					placePattern(newGrid, chosen.pattern, x, y, c, r);
 				}
-			}
-		}
-
-		// LWSS on separate horizontal lanes (they move straight right)
-		const lwssLanes = Math.floor(r / 35);
-		for (let lane = 0; lane < lwssLanes; lane++) {
-			const y = lane * 35 + 20;
-			const lwssInLane = Math.floor(4 * density);
-			for (let i = 0; i < lwssInLane; i++) {
-				// Spread across full width
-				const x = i * 35 + (lane % 4) * 8 + 5;
-				if (x < c - 15 && y < r - 15 && !isInTitleZone(x, y, 5, 4)) {
-					placePattern(newGrid, LWSS, x, y, c, r);
-				}
-			}
-		}
-
-		// MWSS scattered on their own lanes - more of them
-		const mwssLanes = Math.floor(r / 45);
-		for (let lane = 0; lane < mwssLanes; lane++) {
-			const y = lane * 45 + 30;
-			const mwssInLane = Math.floor(3 * density);
-			for (let i = 0; i < mwssInLane; i++) {
-				const x = i * 40 + (lane % 3) * 12 + 10;
-				if (x < c - 20 && y < r - 25 && !isInTitleZone(x, y, 6, 5)) {
-					placePattern(newGrid, MWSS, x, y, c, r);
-				}
-			}
-		}
-
-		// Additional diagonal glider waves across the screen
-		for (let wave = 0; wave < Math.floor(4 * density); wave++) {
-			const startY = wave * 40 + 10;
-			for (let i = 0; i < 5; i++) {
-				const x = wave * 20 + i * 35 + 15;
-				const y = startY + i * 15;
-				if (x < c - 10 && y < r - 10 && y > 5 && !isInTitleZone(x, y, 3, 3)) {
-					placePattern(newGrid, GLIDER, x, y, c, r);
-				}
-			}
-		}
-
-		// Extra gliders on the right side
-		for (let i = 0; i < Math.floor(r / 25); i++) {
-			const y = i * 25 + 12;
-			for (let j = 0; j < 3; j++) {
-				const x = c * 0.6 + j * 30 + (i % 3) * 10;
-				if (x < c - 10 && y < r - 10 && !isInTitleZone(x, y, 3, 3)) {
-					placePattern(newGrid, GLIDER, x, y, c, r);
-				}
-			}
-		}
-
-		// Extra LWSS on the right
-		for (let i = 0; i < Math.floor(r / 50); i++) {
-			const y = i * 50 + 25;
-			for (let j = 0; j < 2; j++) {
-				const x = c * 0.5 + j * 40 + (i % 2) * 15;
-				if (x < c - 15 && y < r - 15 && !isInTitleZone(x, y, 5, 4)) {
-					placePattern(newGrid, LWSS, x, y, c, r);
-				}
-			}
-		}
-
-		// Scatter some random cells for extra chaos and spontaneous patterns
-		// Avoid the title zone
-		const randomCells = Math.floor(c * r * 0.003); // 0.3% random fill
-		for (let i = 0; i < randomCells; i++) {
-			const x = Math.floor(Math.random() * c);
-			const y = Math.floor(Math.random() * r);
-			if (!isInTitleZone(x, y, 1, 1)) {
-				newGrid[x][y] = true;
 			}
 		}
 
@@ -497,16 +414,23 @@
 	}
 
 	function handleDoubleClick(e: MouseEvent): void {
-		// Double click spawns a spaceship
+		// Double click spawns a random spaceship
 		if (!canvas) return;
 		const rect = canvas.getBoundingClientRect();
 		const x = Math.floor((e.clientX - rect.left) / cellSize);
 		const y = Math.floor((e.clientY - rect.top) / cellSize);
 
 		if (grid[x]) {
-			// Randomly choose between LWSS and MWSS
-			const pattern = Math.random() > 0.5 ? LWSS : MWSS;
-			placePattern(grid, pattern, x - 2, y - 2, cols, rows);
+			// Randomly choose from patterns appropriate for screen size
+			const chosen = getRandomPattern(cols, rows);
+			placePattern(
+				grid,
+				chosen.pattern,
+				x - Math.floor(chosen.width / 2),
+				y - Math.floor(chosen.height / 2),
+				cols,
+				rows
+			);
 		}
 	}
 
