@@ -14,29 +14,28 @@
 	<div class="pixel-container">
 		<div class="text-sm text-light/80 leading-relaxed font-mono space-y-6">
 			<p>
-				Hi, I'm <span class="text-accent">bbs</span>, also known as
+				Hi, I'm <span class="text-accent">bbs</span>, aka
 				<span class="text-light">boboshan</span> or
 				<span class="text-light font-mono">帕克马拉啵啵山</span>.
 			</p>
 
 			<p>
-				I'm a developer who loves building things on the web. This site is my digital garden where I
-				share my thoughts, projects, and experiments.
+				I'm a sound designer, composer, and developer based in Shanghai. I build tools, interactive
+				web experiences, and game audio systems.
 			</p>
 
 			<p>
-				The background you see is <span class="text-light">Conway's Game of Life</span> — a cellular automaton
-				that demonstrates how complex patterns can emerge from simple rules. Click or drag anywhere to
-				create new life.
+				The background is <span class="text-light">Conway's Game of Life</span> — a cellular automaton
+				demonstrating how complex patterns emerge from simple rules. Click or drag to create life.
 			</p>
 
 			<div class="mt-6 pt-6 border-t border-light/20">
 				<h2 class="text-xs text-light font-pixel mb-4">interests</h2>
 				<ul class="text-xs space-y-2">
+					<li>&gt; game audio &amp; middleware</li>
 					<li>&gt; creative coding &amp; generative art</li>
-					<li>&gt; web technologies &amp; performance</li>
-					<li>&gt; pixel art &amp; retro aesthetics</li>
-					<li>&gt; open source</li>
+					<li>&gt; web technologies &amp; tool dev</li>
+					<li>&gt; pixel art &amp; aesthetics</li>
 				</ul>
 			</div>
 

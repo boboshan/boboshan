@@ -323,47 +323,89 @@
 		grid = newGrid;
 	}
 
+	// Pre-create grid pattern for performance (created once on resize)
+	let gridPattern: CanvasPattern | null = null;
+
+	function createGridPattern(): void {
+		if (!ctx) return;
+		const patternCanvas = document.createElement('canvas');
+		patternCanvas.width = cellSize;
+		patternCanvas.height = cellSize;
+		const pctx = patternCanvas.getContext('2d');
+		if (!pctx) return;
+
+		pctx.fillStyle = DEAD_COLOR;
+		pctx.fillRect(0, 0, cellSize, cellSize);
+		pctx.strokeStyle = GRID_COLOR;
+		pctx.lineWidth = 0.5;
+		pctx.strokeRect(0, 0, cellSize, cellSize);
+
+		gridPattern = ctx.createPattern(patternCanvas, 'repeat');
+	}
+
 	function draw(): void {
 		if (!ctx || cols <= 0 || rows <= 0) return;
 
-		ctx.fillStyle = DEAD_COLOR;
-		ctx.fillRect(0, 0, width, height);
-
-		// Draw grid lines (subtle)
-		ctx.strokeStyle = GRID_COLOR;
-		ctx.lineWidth = 0.5;
-		for (let i = 0; i <= cols; i++) {
-			ctx.beginPath();
-			ctx.moveTo(i * cellSize, 0);
-			ctx.lineTo(i * cellSize, height);
-			ctx.stroke();
-		}
-		for (let j = 0; j <= rows; j++) {
-			ctx.beginPath();
-			ctx.moveTo(0, j * cellSize);
-			ctx.lineTo(width, j * cellSize);
-			ctx.stroke();
+		// Draw background with grid pattern (much faster than individual lines)
+		if (gridPattern) {
+			ctx.fillStyle = gridPattern;
+			ctx.fillRect(0, 0, width, height);
+		} else {
+			ctx.fillStyle = DEAD_COLOR;
+			ctx.fillRect(0, 0, width, height);
 		}
 
-		// Draw cells
+		// Batch cells by color to minimize fillStyle changes
+		const aliveCells: [number, number][] = [];
+		const frozenCells_draw: [number, number][] = [];
+		const paddingCells_draw: [number, number][] = [];
+
 		for (let i = 0; i < cols; i++) {
 			for (let j = 0; j < rows; j++) {
 				if (grid[i]?.[j]) {
-					// Use different color for frozen cells, padding cells, and normal cells
 					if (isFrozen(i, j)) {
-						ctx.fillStyle = FROZEN_COLOR;
+						frozenCells_draw.push([i, j]);
 					} else if (isPaddingCell(i, j)) {
-						ctx.fillStyle = PADDING_CELL_COLOR;
+						paddingCells_draw.push([i, j]);
 					} else {
-						ctx.fillStyle = ALIVE_COLOR;
+						aliveCells.push([i, j]);
 					}
-					ctx.fillRect(i * cellSize + 1, j * cellSize + 1, cellSize - 2, cellSize - 2);
 				}
+			}
+		}
+
+		// Draw frozen cells (same color as alive for now)
+		if (frozenCells_draw.length > 0) {
+			ctx.fillStyle = FROZEN_COLOR;
+			for (const [i, j] of frozenCells_draw) {
+				ctx.fillRect(i * cellSize + 1, j * cellSize + 1, cellSize - 2, cellSize - 2);
+			}
+		}
+
+		// Draw padding cells
+		if (paddingCells_draw.length > 0) {
+			ctx.fillStyle = PADDING_CELL_COLOR;
+			for (const [i, j] of paddingCells_draw) {
+				ctx.fillRect(i * cellSize + 1, j * cellSize + 1, cellSize - 2, cellSize - 2);
+			}
+		}
+
+		// Draw alive cells
+		if (aliveCells.length > 0) {
+			ctx.fillStyle = ALIVE_COLOR;
+			for (const [i, j] of aliveCells) {
+				ctx.fillRect(i * cellSize + 1, j * cellSize + 1, cellSize - 2, cellSize - 2);
 			}
 		}
 	}
 
 	function gameLoop(timestamp: number): void {
+		// Skip updates when tab is hidden (saves CPU)
+		if (document.hidden) {
+			animationId = requestAnimationFrame(gameLoop);
+			return;
+		}
+
 		if (running && timestamp - lastUpdate >= UPDATE_INTERVAL) {
 			nextGeneration();
 			lastUpdate = timestamp;
@@ -472,6 +514,7 @@
 		if (canvas) {
 			canvas.width = width;
 			canvas.height = height;
+			createGridPattern(); // Recreate pattern for new cell size
 		}
 
 		// Only recreate grid if width changed (actual resize, not mobile scroll)

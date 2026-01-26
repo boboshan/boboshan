@@ -1,6 +1,4 @@
-<script lang="ts">
-	import SEO from '$lib/components/SEO.svelte';
-
+<script module>
 	interface Work {
 		slug: string;
 		title: string;
@@ -11,21 +9,21 @@
 	}
 
 	// Real projects
-	const works: Work[] = [
+	// Sorted by year (newest first)
+	export const works: Work[] = [
 		{
-			slug: 'chordloud',
-			title: 'ChordLoud',
-			description: 'Most intuitive and accurate music chord detection and learning tool online.',
-			tags: ['music theory', 'notation', 'education', 'web'],
-			year: 2023,
-			url: 'https://chordloud.com/'
+			slug: 'boboshan',
+			title: 'boboshan.com',
+			description: 'This personal website with interactive Game of Life background.',
+			tags: ['svelte', 'typescript'],
+			year: 2025
 		},
 		{
 			slug: 'wwiser',
 			title: 'Wwiser',
 			description:
 				'A collection of productivity tools for Wwise sound designers just in the browser.',
-			tags: ['wwise', 'waapi', 'game audio', 'wwise tools'],
+			tags: ['wwise', 'waapi', 'game audio'],
 			year: 2024,
 			url: 'https://wwiser.net/'
 		},
@@ -34,18 +32,47 @@
 			title: 'Roll',
 			description:
 				'Free browser-based video editing tools. Compress, convert, trim, and mute videos instantly. No uploads, no servers — all processing happens locally in your browser.',
-			tags: ['ffmpeg', 'wasm', 'free video tools', 'privacy-first'],
+			tags: ['ffmpeg', 'wasm', 'video tools', 'privacy-first'],
 			year: 2024,
 			url: 'https://roll.wwiser.net/'
 		},
 		{
-			slug: 'boboshan',
-			title: 'boboshan.com',
-			description: 'This personal website with interactive Game of Life background.',
-			tags: ['svelte', 'typescript'],
-			year: 2025
+			slug: 'chordloud',
+			title: 'ChordLoud',
+			description: 'Most intuitive and accurate music chord detection and learning tool online.',
+			tags: ['music theory', 'education', 'web'],
+			year: 2023,
+			url: 'https://chordloud.com/'
+		},
+		{
+			slug: 'party-animals',
+			title: 'Party Animals',
+			description: 'Audio Director for the physics-based multiplayer party game.',
+			tags: ['game audio', 'audio tools', 'multiplayer'],
+			year: 2023,
+			url: 'https://www.partyanimalsgame.com/'
+		},
+		{
+			slug: 'a-nap-in-fluoroscopy-buses',
+			title: 'A Nap in Fluoroscopy Buses',
+			description: 'Sound Design and Original Score for this experimental animation.',
+			tags: ['animation', 'experimental'],
+			year: 2022,
+			url: 'https://www.animaphix.com/a-nap-in-fluoroscopy-buses-un-pisolino-nei-bus-di-fluoroscopia/?lang=en'
+		},
+		{
+			slug: 'i-miss-her',
+			title: 'I Miss Her',
+			description: 'Sound Design for this experimental animated short.',
+			tags: ['animation', 'experimental'],
+			year: 2021,
+			url: 'https://www.imdb.com/title/tt11595426/'
 		}
 	];
+</script>
+
+<script lang="ts">
+	import SEO from '$lib/components/SEO.svelte';
 </script>
 
 {#snippet workContent(work: Work)}
